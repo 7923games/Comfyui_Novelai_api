@@ -148,18 +148,25 @@ NovelAI APIに負荷をかけないための待機ノードです。複数の画
 - `random_wait`: ランダム待機を有効化（オプション）
   - 有効時: 0.01～2.99秒のランダムな待機時間が追加されます
   - サーバー負荷の分散に有効です
-- `any_input`: 任意の入力（オプション）
+- オプショナル入力: `image`, `latent`, `conditioning`, `model`, `vae`, `clip`
   - ワークフローの他のノードと接続するためのパススルー
+  - 使用する型に対応した入力/出力を接続してください
 
 **出力:**
 - 入力された値をそのまま出力（パススルー）
+- 複数の型に対応: IMAGE, LATENT, CONDITIONING, MODEL, VAE, CLIP
 
 **使用例:**
 ```
-Image Generator → Wait (2.0s, random=True) → Save Image
+NovelAI Image Generator → NovelAI Wait (image出力) → Save Image
+NovelAI Image Generator → NovelAI Wait (latent出力) → VAE Decode
 ```
 
 このノードは、他のノードの間に配置して、API呼び出しの間隔を制御できます。`random_wait`を有効にすることで、複数のリクエストが同時に送信されるのを避け、より自然な間隔でAPIを利用できます。
+
+**注意:**
+- 使用したい型の入力/出力を接続してください（例: IMAGE型を扱う場合はimageポートを使用）
+- 複数の型を同時に通過させることも可能です
 
 ## APIキーの取得
 

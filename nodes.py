@@ -716,15 +716,20 @@ class NovelAIWait:
                 }),
             },
             "optional": {
-                "any_input": ("*",),
+                "image": ("IMAGE",),
+                "latent": ("LATENT",),
+                "conditioning": ("CONDITIONING",),
+                "model": ("MODEL",),
+                "vae": ("VAE",),
+                "clip": ("CLIP",),
             }
         }
 
-    RETURN_TYPES = ("*",)
+    RETURN_TYPES = ("IMAGE", "LATENT", "CONDITIONING", "MODEL", "VAE", "CLIP")
     FUNCTION = "wait"
     CATEGORY = "NovelAI"
 
-    def wait(self, wait_time, random_wait, any_input=None):
+    def wait(self, wait_time, random_wait, image=None, latent=None, conditioning=None, model=None, vae=None, clip=None):
         """
         指定された時間待機する
         random_waitが有効な場合は、追加で0.01～2.99秒のランダム待機を行う
@@ -743,7 +748,7 @@ class NovelAIWait:
         time.sleep(total_wait)
 
         # 入力をそのまま返す（パススルー）
-        return (any_input,)
+        return (image, latent, conditioning, model, vae, clip)
 
 
 # ノードの登録
