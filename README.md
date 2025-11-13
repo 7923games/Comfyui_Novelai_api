@@ -8,6 +8,7 @@ NovelAI APIを使用してComfyUIで画像生成を行うためのカスタム�
 - **NovelAI Image to Image**: 既存の画像をベースに新しい画像を生成
 - **NovelAI Character Prompt**: V4/V4.5モデル用の個別キャラクター定義
 - **NovelAI Character Prompt Combine**: 複数のキャラクタープロンプトを結合
+- **NovelAI Wait**: API負荷軽減のための待機ノード
 
 ## インストール
 
@@ -137,6 +138,28 @@ Character Prompt Combine → Generator ノード
 - 位置を指定する場合、`use_coords`が自動的に有効になります
 - base_captionと組み合わせて、複雑なマルチキャラクター画像を生成できます
 - `character_negative_prompt`は各キャラクター固有のネガティブプロンプトです。メインの`negative_prompt`とは別に処理されます
+
+### NovelAI Wait
+
+NovelAI APIに負荷をかけないための待機ノードです。複数の画像を連続生成する際に使用します。
+
+**入力パラメータ:**
+- `wait_time`: 待機時間（0.00～30.00秒、0.01秒刻み）
+- `random_wait`: ランダム待機を有効化（オプション）
+  - 有効時: 0.01～2.99秒のランダムな待機時間が追加されます
+  - サーバー負荷の分散に有効です
+- `any_input`: 任意の入力（オプション）
+  - ワークフローの他のノードと接続するためのパススルー
+
+**出力:**
+- 入力された値をそのまま出力（パススルー）
+
+**使用例:**
+```
+Image Generator → Wait (2.0s, random=True) → Save Image
+```
+
+このノードは、他のノードの間に配置して、API呼び出しの間隔を制御できます。`random_wait`を有効にすることで、複数のリクエストが同時に送信されるのを避け、より自然な間隔でAPIを利用できます。
 
 ## APIキーの取得
 

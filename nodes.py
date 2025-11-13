@@ -9,6 +9,8 @@ import numpy as np
 import torch
 from PIL import Image
 import json
+import time
+import random
 
 
 class NovelAIImageGenerator:
@@ -693,12 +695,64 @@ class NovelAICharacterPromptCombine:
         return (characters,)
 
 
+class NovelAIWait:
+    """
+    NovelAI Wait ノード
+    APIに負荷をかけないための待機ノード
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "wait_time": ("FLOAT", {
+                    "default": 1.0,
+                    "min": 0.0,
+                    "max": 30.0,
+                    "step": 0.01,
+                }),
+                "random_wait": ("BOOLEAN", {
+                    "default": False,
+                }),
+            },
+            "optional": {
+                "any_input": ("*",),
+            }
+        }
+
+    RETURN_TYPES = ("*",)
+    FUNCTION = "wait"
+    CATEGORY = "NovelAI"
+
+    def wait(self, wait_time, random_wait, any_input=None):
+        """
+        指定された時間待機する
+        random_waitが有効な場合は、追加で0.01～2.99秒のランダム待機を行う
+        """
+        total_wait = wait_time
+
+        # ランダム待機を追加
+        if random_wait:
+            random_additional = random.uniform(0.01, 2.99)
+            total_wait += random_additional
+            print(f"[NovelAI Wait] Base: {wait_time:.2f}s + Random: {random_additional:.2f}s = Total: {total_wait:.2f}s")
+        else:
+            print(f"[NovelAI Wait] Waiting for {wait_time:.2f}s")
+
+        # 待機実行
+        time.sleep(total_wait)
+
+        # 入力をそのまま返す（パススルー）
+        return (any_input,)
+
+
 # ノードの登録
 NODE_CLASS_MAPPINGS = {
     "NovelAIImageGenerator": NovelAIImageGenerator,
     "NovelAIImageToImage": NovelAIImageToImage,
     "NovelAICharacterPrompt": NovelAICharacterPrompt,
     "NovelAICharacterPromptCombine": NovelAICharacterPromptCombine,
+    "NovelAIWait": NovelAIWait,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -706,4 +760,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "NovelAIImageToImage": "NovelAI Image to Image",
     "NovelAICharacterPrompt": "NovelAI Character Prompt",
     "NovelAICharacterPromptCombine": "NovelAI Character Prompt Combine",
+    "NovelAIWait": "NovelAI Wait",
 }
